@@ -1,22 +1,24 @@
 import { useState } from "react";
 import { LeftPanel } from "./LeftPanel.js";
-import { DocumentEditor } from "./DocumentEditor.js";
+import { DocsBrowser } from "./DocsBrowser.js";
+import { TemplateBrowser, SnippetBrowser } from "./ItemBrowser.js";
 import { PreviewPanel } from "./PreviewPanel.js";
 
+type Mode = "docs" | "templates" | "snippets";
+
 export function App() {
-  const [activeId, setActiveId] = useState<string | null>(null);
+  const [mode, setMode] = useState<Mode>("docs");
+  const [activeDocId, setActiveDocId] = useState<string | null>(null);
 
   return (
-    <div className="app">
-      <LeftPanel activeDocId={activeId} onSelectDoc={setActiveId} />
+    <div className={mode === "docs" ? "app" : "app no-preview"}>
+      <LeftPanel mode={mode} onChangeMode={setMode} />
       <main className="main">
-        {activeId ? (
-          <DocumentEditor key={activeId} id={activeId} />
-        ) : (
-          <div className="empty">select or create a document</div>
-        )}
+        {mode === "docs" && <DocsBrowser onSelectDoc={setActiveDocId} />}
+        {mode === "templates" && <TemplateBrowser />}
+        {mode === "snippets" && <SnippetBrowser />}
       </main>
-      <PreviewPanel docId={activeId} />
+      {mode === "docs" && <PreviewPanel docId={activeDocId} />}
     </div>
   );
 }

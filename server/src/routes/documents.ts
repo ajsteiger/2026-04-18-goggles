@@ -24,6 +24,17 @@ documentsRouter.post("/", async (req, res) => {
   }
 });
 
+documentsRouter.post("/:id/fork", async (req, res) => {
+  const { name } = req.body ?? {};
+  if (!name) return res.status(400).json({ error: "name required" });
+  try {
+    const d = await documents.fork(req.params.id, name);
+    res.json(d);
+  } catch (e: any) {
+    res.status(400).json({ error: e.message });
+  }
+});
+
 documentsRouter.patch("/:id", async (req, res) => {
   try {
     const m = await documents.updateManifest(req.params.id, req.body ?? {});

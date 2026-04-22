@@ -44,6 +44,7 @@ export type DocumentManifest = {
   hasTemplateOverride: boolean;
   paramBindings: Record<string, ParamBinding>;
   notes: string;
+  tags: string[];
 };
 
 export type DocumentFull = DocumentManifest & {
@@ -135,8 +136,9 @@ export function assembleBuild(doc: DocumentFull): string {
       const fork = forks.find((f) => f.id === b.forkId);
       body = fork ? fork.content : "";
     }
-    defs.push(`\\newcommand{\\@@${p}}{${body}}`);
+    defs.push(`\\expandafter\\long\\expandafter\\def\\csname @@${p}\\endcsname{${body}}`);
   }
 
-  return `\\makeatletter\n${defs.join("\n")}\n${stripped}\n\\makeatother\n`;
+  const rendered = stripped.replace(PARAM_RE, (_match, name: string) => `\\csname @@${name}\\endcsname`);
+  return `\\makeatletter\n${defs.join("\n")}\n${rendered}\n\\makeatother\n`;
 }

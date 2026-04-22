@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+  <body>
+    <button id="run">compile current doc</button>
+    <pre id="log"></pre>
+    <script src="/swiftlatex/PdfTeXEngine.js"></script>
+    <script type="module">
+      import { assembleBuild } from '/@fs/Users/alexsteiger/src/tries/2026-04-18-goggles/shared/dist/index.js';
+
+      const log = document.getElementById('log');
+
+      function write(value) {
+        log.textContent = typeof value === 'string' ? value : JSON.stringify(value, null, 2);
+      }
+
+      document.getElementById('run').addEventListener('click', async () => {
+        try {
+          write('loading document...');
+          const docId = 'c4tXsFu2uv';
+          const response = await fetch(`/api/documents/${docId}`);
+          const doc = await response.json();
+          const tex = assembleBuild(doc);
+
+          const engine = new window.PdfTeXEngine();
+          await engine.loadEngine();
+          engine.setTexliveEndpoint(`${location.origin}/api/swiftlatex`);
+          engine.writeMemFSFile('main.tex', tex);
+          engine.setEngineMainFile('main.tex');
+
+          write('compiling...');
+          const result = await engine.compileLaTeX();
+          write({
+            status: result.status,
+            pdfBytes: result.pdf?.length ?? null,
+            log: result.log,
+          });
+        } catch (err) {
+          write({
+            error: String(err),
+            message: err?.message,
+            stack: err?.stack,
+          });
+        }
+      });
+    </script>
+  </body>
+</html>

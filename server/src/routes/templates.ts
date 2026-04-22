@@ -18,3 +18,14 @@ templatesRouter.put("/:id", async (req, res) => {
   const t = await templates.put(req.params.id, content, description, notes, paramDescs, tags);
   res.json(t);
 });
+
+templatesRouter.post("/:id/fork", async (req, res) => {
+  const { id } = req.body ?? {};
+  if (!id) return res.status(400).json({ error: "id required" });
+  try {
+    const t = await templates.fork(req.params.id, id);
+    res.json(t);
+  } catch (e: any) {
+    res.status(400).json({ error: e.message });
+  }
+});

@@ -18,3 +18,14 @@ snippetsRouter.put("/:id", async (req, res) => {
   const s = await snippets.put(req.params.id, content, description, notes, paramDescs, tags);
   res.json(s);
 });
+
+snippetsRouter.post("/:id/fork", async (req, res) => {
+  const { id } = req.body ?? {};
+  if (!id) return res.status(400).json({ error: "id required" });
+  try {
+    const s = await snippets.fork(req.params.id, id);
+    res.json(s);
+  } catch (e: any) {
+    res.status(400).json({ error: e.message });
+  }
+});
