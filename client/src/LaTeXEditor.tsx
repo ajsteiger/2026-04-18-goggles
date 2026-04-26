@@ -24,7 +24,7 @@ export function LaTeXEditor({
 }) {
   const hostRef = useRef<HTMLDivElement>(null);
   const extensions = useMemo(() => {
-    if (!compactSingleLine) return [latexLang];
+    if (!compactSingleLine) return [latexLang, EditorView.lineWrapping];
     return [
       latexLang,
       EditorView.lineWrapping,
@@ -60,7 +60,7 @@ export function LaTeXEditor({
         extensions={extensions}
         onChange={onChange}
         readOnly={readOnly}
-        basicSetup={{ lineNumbers: false, foldGutter: false }}
+        basicSetup={{ lineNumbers: true, foldGutter: false }}
         theme="light"
         height={minHeight}
       />
